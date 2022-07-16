@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import Tk, ttk  # модуль с виджетами ttk
 import sys
+from process import CpuBar
 
 class Application(tk.Tk):
     # создаем окно, создаем методы
@@ -12,7 +13,9 @@ class Application(tk.Tk):
         self.resizable(False, False) # нельзя менять размер (растягивать) ширину и длинну
         self.title('CPU-RAM usage monitor bar GK')  # надпись вверху на окне
 
-        self.set_ui()
+        self.cpu = CpuBar() # создаем свойство которое будем использовать для построения графических баров
+        self.set_ui()  # запускаем метод который строит базовое окно программы
+        self.make_bar_cpu_usage() # запускаем метод который показывает колличество ядер и потоков
 
     # создаем виджеты
     def set_ui(self):
@@ -32,11 +35,28 @@ class Application(tk.Tk):
         ttk.Button(self.bar2, text='двигать').pack(side=tk.LEFT)
         ttk.Button(self.bar2, text='>>>>>>>').pack(side=tk.LEFT)
 
-        self.bar2 = ttk.LabelFrame(self, text='СИЛА') # создаем рамку (фрейм) в которую разместим прогрессбары
-        self.bar2.pack(fill=tk.BOTH)
+        self.bar = ttk.LabelFrame(self, text='ЗАГРУЗКА CPU') # создаем рамку (фрейм) в которую разместим прогрессбары
+        self.bar.pack(fill=tk.BOTH)
 
         self.bind_class('Tk', '<Enter>', self.enter_mouse) # Enter срабатывает при наведении мыши
         self.bind_class('Tk', '<Leave>', self.leave_mouse) # Leave срабатывает при убирании мыши
+
+    def make_bar_cpu_usage(self):  # создаем метод который показывает колличество ядер и потоков
+        ttk.Label(self.bar, 
+            text=f'Физические ядра: {self.cpu.cpu_count}, Логические потоки: {self.cpu.cpu_count_logical}', 
+            anchor=tk.CENTER).pack(fill=tk.X) # размещаем текст во фрейме bar
+
+    # размещаем прогрессбары и доп метки при помощи цикла, т.к. кол-во ядер и потоков бывает разное...
+        self.list_label = [] # создаем пустые списки
+        self.list_pbar = []  # 
+
+        for i in range(self.cpu.cpu_count_logical):  # цикл сработает столько раз сколько у нас потоков
+            self.list_label.append(ttk.Label(self.bar, anchor=tk.CENTER))  # размещаем в bar по центру
+            self.list_pbar.append(ttk.Progressbar(self.bar, length=100)) # размещаем в bar, делится на 100 ед
+        for i in range(self.cpu.cpu_count_logical):  # этим циклом упаковываем 
+            self.list_label[i].pack(fill=tk.X)   
+            self.list_pbar[i].pack(fill=tk.X)
+
 
     def enter_mouse(self, event):  # событие которое будет происходить при наведении мыши
         if self.combo_win.current() == 0 or 1: # если выбрано "скрыто" или "поверх"
@@ -58,6 +78,6 @@ class Application(tk.Tk):
 
 
 
-
-root = Application()
-root.mainloop()
+if __name__ == '__main__':
+    root = Application()
+    root.mainloop()
