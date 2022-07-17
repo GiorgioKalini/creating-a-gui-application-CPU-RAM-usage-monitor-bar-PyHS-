@@ -2,8 +2,9 @@ import tkinter as tk
 from tkinter import Tk, ttk  # модуль с виджетами ttk
 import sys
 from process import CpuBar
+from widget_update import Configure_widgets
 
-class Application(tk.Tk):
+class Application(tk.Tk, Configure_widgets): # наследуемся от Configure_widgets
     # создаем окно, создаем методы
     def __init__(self):
         tk.Tk.__init__(self)
@@ -16,6 +17,7 @@ class Application(tk.Tk):
         self.cpu = CpuBar() # создаем свойство которое будем использовать для построения графических баров
         self.set_ui()  # запускаем метод который строит базовое окно программы
         self.make_bar_cpu_usage() # запускаем метод который показывает колличество ядер и потоков
+        self.configure_cpu_bar() # запускаем метод обновляющий виджеты прогрессбаров
 
     # создаем виджеты
     def set_ui(self):
@@ -32,7 +34,7 @@ class Application(tk.Tk):
         self.combo_win.pack(side=tk.LEFT)
 
         # создаем на фрейме кнопки и упаковываем их
-        ttk.Button(self.bar2, text='двигать').pack(side=tk.LEFT)
+        ttk.Button(self.bar2, text='двигать', command=self.configure_win).pack(side=tk.LEFT)
         ttk.Button(self.bar2, text='>>>>>>>').pack(side=tk.LEFT)
 
         self.bar = ttk.LabelFrame(self, text='ЗАГРУЗКА CPU') # создаем рамку (фрейм) в которую разместим прогрессбары
@@ -57,6 +59,11 @@ class Application(tk.Tk):
             self.list_label[i].pack(fill=tk.X)   
             self.list_pbar[i].pack(fill=tk.X)
 
+            # создаем прогресбар и метку для отображения загрузки памяти
+        self.ram_lab = ttk.Label(self.bar, text='', anchor=tk.CENTER) # создаем свойство для метки RAM
+        self.ram_lab.pack(fill=tk.X)   # упаковываем (размещаем)
+        self.ram_bar = ttk.Progressbar(self.bar, length=100)    # создаем свойство для прогресбара RAM
+        self.ram_bar.pack(fill=tk.X)   # упаковываем (размещаем)
 
     def enter_mouse(self, event):  # событие которое будет происходить при наведении мыши
         if self.combo_win.current() == 0 or 1: # если выбрано "скрыто" или "поверх"
