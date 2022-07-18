@@ -1,3 +1,5 @@
+"""Модуль считывает индикаторы загрузки ЦП и ОЗУ."""
+
 import psutil as pt   # импортируем модуль psutil
 
 
@@ -9,6 +11,9 @@ class CpuBar:       # создаем класс
 
     def cpu_percent_return(self):  # создаем метод который возвращает процент загрузки каждого ядра
         return pt.cpu_percent(percpu=True) # percpu=True - отдельно по каждому потоку
+
+    def cpu_one_return(self):  # создаем метод который возвращает процент загрузки всего процессора
+        return pt.cpu_percent()
 
     def ram_usage(self):  # создаем метод который возвращает загруженность опер. памяти
         return pt.virtual_memory()  # возвращает кортэж с параметрами памяти
